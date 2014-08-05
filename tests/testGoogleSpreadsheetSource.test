@@ -1,0 +1,70 @@
+<?php
+
+use Google\Spreadsheet\SpreadsheetService;
+
+class testGoogleSpreadsheetSource extends DrupalWebTestCase
+{
+
+	protected $auth;
+
+	public static function getInfo()
+	{
+		return array(
+			'name'        => 'Migrate Google Spreadsheet Source',
+			'description' => 'Test to ensure that google spreadsheet source is working correctly.',
+			'group'       => 'Migrate GDocs',
+		);
+	}
+
+	protected function setUp()
+	{
+		parent::setUp(array('migrate', 'composer_autoload', 'migrate_gdocs'));
+		$this->privileged_user = $this->drupalCreateUser(
+			array(
+				'access administration pages',
+			)
+		);
+		$this->drupalLogin($this->privileged_user);
+
+		//Get auth
+		$json_file = __DIR__ . '/Aduro-18fe239da8f0.json';
+		$json = json_decode(file_get_contents($json_file));
+		$private_key = file_get_contents(__DIR__.'/Aduro-e4b739040291.p12');
+
+		$this->auth = array(
+			'client_id'            => $json->client_id,
+			'client_email'         => $json->client_email,
+			'private_key'          => $private_key,
+			'private_key_password' => 'notasecret'
+		);
+	}
+
+	/**
+	 * Test class GoogleSpreadsheet
+	 */
+	public function testGoogleSpreadsheetService()
+	{
+		//Set up auth
+		$google_client = new Google_Client();
+		$google_client->setApplicationName('Aduro Fixtures');
+		googleSpreadsheetSourceFactory::setServiceRequest($this->auth, $google_client);
+
+		$this->assertNotNull(googleSpreadsheetSourceFactory::getAccessToken(),'Access token is not null');
+
+		$spreadsheet_service = new SpreadsheetService();
+
+		//Get list of spreadsheets
+		$spreadsheetFeed = $spreadsheet_service->getSpreadsheets();
+		$this->assertEqual(get_class($spreadsheetFeed),'Google\Spreadsheet\SpreadsheetFeed',"Spreadsheet can be returned");
+	}
+
+	public function testGoogleSpreadsheet(){
+		$id = "14at56ke6g4qbV8-EyDZ6Pv0RNFbRmjeLXbvIkxuQY_c";
+		$spreadsheet_service = new SpreadsheetService();
+		$source = googleSpreadsheetSourceFactory::getGoogleSpreadsheetSource($spreadsheet_service, $id);
+		$this->assertEqual(get_class($source),'GoogleSpreadsheet',"Spreadsheet can be returned");
+		$this->assertEqual($source->computeCount(),4,"There are 4 rows in the spreadsheet");
+		$fields = $source->fields();
+		$this->assertNotNull($fields, "There are fields");
+	}
+}

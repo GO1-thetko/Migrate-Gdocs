@@ -1,0 +1,22 @@
+{
+    "name": "GO1/Module/MigrateGdocs",
+    "description": "Google docs spreadsheet integration with Drupal Migrate",
+    "minimum-stability": "stable",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Thet Ko",
+            "email": "thet@go1.com.au"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/asimlqt/php-google-spreadsheet-client"
+        }
+    ],
+    "require": {
+        "asimlqt/php-google-spreadsheet-client": "2.1.*",
+        "google/apiclient": "1.0.4"
+    }
+}

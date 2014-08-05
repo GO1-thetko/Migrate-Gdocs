@@ -1,0 +1,122 @@
+<?php
+
+function migrate_gdocs_menu()
+{
+	return array(
+		'admin/config/services/migrate_gdocs_oauth' => array(
+			'page callback'    => 'drupal_get_form',
+			'page arguments'   => array('migrate_gdocs_oauth'),
+			'access arguments' => array('access administration pages'),
+			'title'            => 'Migrate Google oAuth',
+			'description'      => 'Manage the JWT oAuth File'
+		)
+	);
+}
+
+function migrate_gdocs_oauth($form, &$form_state)
+{
+	$auth = migrate_gdocs_get_auth();
+
+	$form['client_id'] = array(
+		'#type'          => 'textfield',
+		'#title'         => 'Client Id',
+		'#required'      => true,
+		'#default_value' => isset($auth['client_id']) ? $auth['client_id'] : ''
+	);
+	$form['client_email'] = array(
+		'#type'          => 'textfield',
+		'#title'         => 'Client Email',
+		'#required'      => true,
+		'#default_value' => isset($auth['client_email']) ? $auth['client_email'] : ''
+	);
+	$form['private_key'] = array(
+		'#type'        => 'file',
+		'#title'       => t("P12 Private Key"),
+		'#description' => t("Private Key from https://console.developers.google.com/project/...")
+	);
+	$form['private_key_password'] = array(
+		'#type'          => 'password',
+		'#title'         => t("P12 Private Key Password"),
+		'#default_value' => isset($auth['private_key_password']) ? $auth['private_key_password'] : ''
+	);
+
+	$form['submit'] = array(
+		'#type'  => 'submit',
+		'#value' => t('Submit')
+	);
+
+	return $form;
+}
+
+function migrate_gdocs_oauth_validate($form, &$form_state)
+{
+	$file = file_save_upload(
+		'private_key',
+		array(
+			'file_validate_extensions' => array('p12'),
+		)
+	);
+	if ($file) {
+		if ($file = file_move($file, 'public://')) {
+			$form_state['values']['private_key'] = $file;
+		} else {
+			form_set_error('file', t('Failed to write the uploaded file the site\'s file folder.'));
+		}
+	} else {
+		form_set_error('file', t('No file was uploaded.'));
+	}
+}
+
+function migrate_gdocs_oauth_submit($form, &$form_state)
+{
+	$file = $form_state['values']['private_key'];
+	unset($form_state['values']['private_key']);
+	$file->status = FILE_STATUS_PERMANENT;
+	file_save($file);
+
+	$auth = array(
+		'client_id'            => $form_state['values']['client_id'],
+		'client_email'         => $form_state['values']['client_email'],
+		'private_key'          => drupal_realpath($file->uri),
+		'private_key_password' => $form_state['values']['private_key_password'],
+	);
+
+	migrate_gdocs_set_auth($auth);
+
+	drupal_set_message(
+		t(
+			'The google jwt has been uploaded: @filename.',
+			array('@filename' => $file->filename)
+		)
+	);
+}
+
+/**
+ * Set the filepath to the migrate gDocs JWT File
+ * @param $filepath
+ */
+function migrate_gdocs_set_auth(array $auth)
+{
+	variable_set('migrate_gdocs_auth', $auth);
+}
+
+/**
+ * Return the filepath to the service key used for Google_Auth_AssertionCredentials
+ */
+function migrate_gdocs_get_auth()
+{
+	return variable_get('migrate_gdocs_auth', array());
+}
+
+function setMigrateGDocsServiceRequest(){
+	$auth = migrate_gdocs_get_auth();
+	if(empty($auth)){
+		throw new ErrorException("Please add in the auth details at: ".l("Migrate oAuth Settings",'admin/config/services/migrate_gdocs_oauth'));
+	}
+
+	$google_client = new Google_Client();
+	$google_client->setApplicationName('Aduro Fixtures');
+
+	googleSpreadsheetSourceFactory::setServiceRequest($auth, $google_client);
+
+}

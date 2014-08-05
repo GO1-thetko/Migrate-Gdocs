@@ -1,0 +1,10 @@
+name = Migrate Google Docs
+description = Google Docs add-on to migrate module
+package = GO1
+core = 7.x
+dependencies[] = migrate
+dependencies[] = composer_autoload
+files[] = tests/testGoogleSpreadsheetSource.test
+files[] = plugins/sources/googleSpreadsheet.inc
+files[] = plugins/sources/googleSpreadsheetSourceFactory.inc
+configure = admin/config/services/migrate_oauth
