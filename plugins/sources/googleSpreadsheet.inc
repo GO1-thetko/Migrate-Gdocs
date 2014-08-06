@@ -1,6 +1,7 @@
 <?php
 
 use Google\Spreadsheet\Spreadsheet;
+use Google\Spreadsheet\Worksheet;
 
 /**
  * Implementation of MigrateSource, to handle imports from CSV files.
@@ -23,27 +24,63 @@ class GoogleSpreadsheet extends MigrateSource
 	/**
 	 * @var \Google\Spreadsheet\Worksheet
 	 */
-	protected $worksheet;
+	protected $worksheet, $worksheets;
 
-	protected $fields, $rows;
+	protected $fields, $worksheet_id;
 
 	public function __construct($options, Spreadsheet $spreadsheet, $worksheet_id = 0, $fields = array())
 	{
 		parent::__construct($options);
 		$this->spreadsheet = $spreadsheet;
 		$this->fields = $fields;
+		$this->worksheet_id = $worksheet_id;
+	}
 
-		$worksheets = $spreadsheet->getWorksheets();
-		$this->worksheet = $worksheets[$worksheet_id]; //Get the worksheet
+	/**
+	 * @param $worksheet_id
+	 * @return Worksheet
+	 */
+	private function getWorksheet($worksheet_id)
+	{
+		if (!$this->worksheet) {
+			$this->worksheets = $this->spreadsheet->getWorksheets();
+			$this->worksheet = $this->worksheets[$worksheet_id]; //Get the worksheet
+		}
 
-		//Get all the records in this worksheet
+		return $this->worksheet;
+	}
 
-		/**
-		 * @var $listFeed \Google\Spreadsheet\ListFeed
-		 */
-		$listFeed = $this->worksheet->getListFeed();
-		$this->rows = $listFeed->getEntries();
-		$this->googleSpreadSheetIterator = new GoogleSpreadsheetIterator($this->rows);
+	/**
+	 * Get the worksheet rows
+	 * @param Worksheet $worksheet
+	 * @return GoogleSpreadsheetIterator
+	 */
+	private function getWorksheetRows(Worksheet $worksheet)
+	{
+		if (!$this->googleSpreadSheetIterator) {
+			$listFeed = $worksheet->getListFeed();
+			$listEntries = $listFeed->getEntries();
+
+			foreach($listEntries as $listEntry){
+				$rows[] = $listEntry->getValues();
+			}
+
+			/**
+			 * @var $listFeed \Google\Spreadsheet\ListFeed
+			 */
+			$this->googleSpreadSheetIterator = new GoogleSpreadsheetIterator($rows);
+		}
+
+		return $this->googleSpreadSheetIterator;
+	}
+
+	/**
+	 * Get the header columns
+	 */
+	private function getHeaders(Worksheet $worksheet){
+		//Get the listfeed from the worksheet
+		$listFeed = $worksheet->getListFeed();
+		return $listFeed->getColumnNames($listFeed->xml);
 	}
 
 	/**
@@ -55,10 +92,10 @@ class GoogleSpreadsheet extends MigrateSource
 	 */
 	public function fields()
 	{
-		//Get the first row
-		$header = $this->rows[0];
-		$values = $header->getValues();
-		$header = array_keys($values);
+		$worksheet = $this->getWorksheet($this->worksheet_id);
+		$header = $this->getHeaders($worksheet);
+
+		$fields = array();
 		foreach ($header as $value) {
 			$fields[$value] = $value;
 		}
@@ -75,14 +112,19 @@ class GoogleSpreadsheet extends MigrateSource
 	 */
 	public function computeCount()
 	{
-		return sizeof($this->rows);
+		$worksheet = $this->getWorksheet($this->worksheet_id);
+		$rows = $this->getWorksheetRows($worksheet);
+		return $rows->computeCount();
 	}
 
 	/**
 	 * Implementation of MigrateSource::performRewind().
 	 */
-	public function performRewind() {
-		$this->googleSpreadSheetIterator->rewind();
+	public function performRewind()
+	{
+		$worksheet = $this->getWorksheet($this->worksheet_id);
+		$rows = $this->getWorksheetRows($worksheet);
+		$rows->rewind();
 	}
 
 	/**
@@ -91,16 +133,20 @@ class GoogleSpreadsheet extends MigrateSource
 	 * @return stdClass
 	 *  data for the next row from the JSON source files
 	 */
-	public function getNextRow() {
-		$row = NULL;
+	public function getNextRow()
+	{
+		$worksheet = $this->getWorksheet($this->worksheet_id);
+		$rows = $this->getWorksheetRows($worksheet);
 
-		$this->googleSpreadSheetIterator->next();
+		$row = null;
 
-		if($this->googleSpreadSheetIterator->valid()){
-			$row = $this->googleSpreadSheetIterator->current();
+		$rows->next();
+
+		if ($rows->valid()) {
+			$row = $rows->current();
 			$row = $row->getValues();
 			$row = (object)$row;
-		}else{
+		} else {
 			return null;
 		}
 
@@ -117,6 +163,10 @@ class GoogleSpreadsheetIterator implements Iterator
 	{
 		$this->position = 0;
 		$this->rows = $rows;
+	}
+
+	public function computeCount(){
+		return sizeof($this->rows);
 	}
 
 	/**

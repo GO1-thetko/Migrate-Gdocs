@@ -12,11 +12,11 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/asimlqt/php-google-spreadsheet-client"
+            "url": "https://github.com/GO1-thetko/google-spreadsheet-client.git"
         }
     ],
     "require": {
         "asimlqt/php-google-spreadsheet-client": "2.1.*",
-        "google/apiclient": "1.0.4"
+        "google/apiclient": "1.0.4-beta"
     }
 }

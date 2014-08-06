@@ -114,9 +114,9 @@ function setMigrateGDocsServiceRequest(){
 		throw new ErrorException("Please add in the auth details at: ".l("Migrate oAuth Settings",'admin/config/services/migrate_gdocs_oauth'));
 	}
 
+	$auth['private_key'] = file_get_contents($auth['private_key']);
+
 	$google_client = new Google_Client();
 	$google_client->setApplicationName('Aduro Fixtures');
-
 	googleSpreadsheetSourceFactory::setServiceRequest($auth, $google_client);
-
 }

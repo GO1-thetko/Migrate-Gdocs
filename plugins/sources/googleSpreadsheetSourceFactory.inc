@@ -11,11 +11,11 @@ use Google\Spreadsheet\ServiceRequestFactory;
 abstract class googleSpreadsheetSourceFactory
 {
 
-	static $serviceRequest, $access_token;
+	protected $access_token;
 
 	public static function getGoogleSpreadsheetSource(SpreadsheetService $spreadsheetService, $id)
 	{
-		if (!isset(static::$serviceRequest)) {
+		if (!ServiceRequestFactory::getInstance()) {
 			setMigrateGDocsServiceRequest(); //Set the migrateDocsServiceRequest
 		}
 

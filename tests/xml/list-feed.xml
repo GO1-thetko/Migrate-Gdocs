@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/'
+      xmlns:gsx='http://schemas.google.com/spreadsheets/2006/extended'>
+    <id>https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full</id>
+    <updated>2014-08-06T00:39:38.889Z</updated>
+    <category scheme='http://schemas.google.com/spreadsheets/2006'
+              term='http://schemas.google.com/spreadsheets/2006#list'/>
+    <title type='text'>Sheet1</title>
+    <link rel='alternate' type='application/atom+xml'
+          href='https://docs.google.com/spreadsheets/d/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/edit'/>
+    <link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml'
+          href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full'/>
+    <link rel='http://schemas.google.com/g/2005#post' type='application/atom+xml'
+          href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full'/>
+    <link rel='self' type='application/atom+xml'
+          href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full'/>
+    <author>
+        <name>thet</name>
+        <email>thet@thetko.com.au</email>
+    </author>
+    <openSearch:totalResults>3</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <entry>
+        <id>
+            https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cokwr
+        </id>
+        <updated>2014-08-06T00:39:38.889Z</updated>
+        <category scheme='http://schemas.google.com/spreadsheets/2006'
+                  term='http://schemas.google.com/spreadsheets/2006#list'/>
+        <title type='text'>1</title>
+        <content type='text'>name: Demo 1, mail: demo@demo.com.au, pass: test</content>
+        <link rel='self' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cokwr'/>
+        <link rel='edit' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cokwr/ib4kh2nd65h7l'/>
+        <gsx:id>1</gsx:id>
+        <gsx:name>Demo 1</gsx:name>
+        <gsx:mail>demo@demo.com.au</gsx:mail>
+        <gsx:pass>test</gsx:pass>
+    </entry>
+    <entry>
+        <id>
+            https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cpzh4
+        </id>
+        <updated>2014-08-06T00:39:38.889Z</updated>
+        <category scheme='http://schemas.google.com/spreadsheets/2006'
+                  term='http://schemas.google.com/spreadsheets/2006#list'/>
+        <title type='text'>2</title>
+        <content type='text'>name: Demo 2, mail: demo2@demo.com.au, pass: test</content>
+        <link rel='self' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cpzh4'/>
+        <link rel='edit' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cpzh4/343761f39d593e'/>
+        <gsx:id>2</gsx:id>
+        <gsx:name>Demo 2</gsx:name>
+        <gsx:mail>demo2@demo.com.au</gsx:mail>
+        <gsx:pass>test</gsx:pass>
+    </entry>
+    <entry>
+        <id>
+            https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cre1l
+        </id>
+        <updated>2014-08-06T00:39:38.889Z</updated>
+        <category scheme='http://schemas.google.com/spreadsheets/2006'
+                  term='http://schemas.google.com/spreadsheets/2006#list'/>
+        <title type='text'>3</title>
+        <content type='text'>name: Demo 3, mail: demo3@demo.com.au, pass: test</content>
+        <link rel='self' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cre1l'/>
+        <link rel='edit' type='application/atom+xml'
+              href='https://spreadsheets.google.com/feeds/list/1uJAkfU63bVI3sWhuTqZztbqzRCgRSr_mx1IEXSe6Y6Y/od6/private/full/cre1l/137oa9g9jblef7'/>
+        <gsx:id>3</gsx:id>
+        <gsx:name>Demo 3</gsx:name>
+        <gsx:mail>demo3@demo.com.au</gsx:mail>
+        <gsx:pass>test</gsx:pass>
+    </entry>
+</feed>

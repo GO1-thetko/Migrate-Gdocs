@@ -1,23 +1,25 @@
 <?php
 
 use Google\Spreadsheet\SpreadsheetService;
+use Google\Spreadsheet\ServiceRequestFactory;
 
 class testGoogleSpreadsheetSource extends DrupalWebTestCase
 {
-
-	protected $auth;
+	protected $serviceUrl = "https://spreadsheets.google.com/feeds/spreadsheets/private/full/";
 
 	public static function getInfo()
 	{
 		return array(
-			'name'        => 'Migrate Google Spreadsheet Source',
+			'name' => 'Migrate Google Spreadsheet Source',
 			'description' => 'Test to ensure that google spreadsheet source is working correctly.',
-			'group'       => 'Migrate GDocs',
+			'group' => 'Migrate GDocs',
 		);
 	}
 
 	protected function setUp()
 	{
+		require_once(__DIR__.'/TestServiceRequest.php');
+
 		parent::setUp(array('migrate', 'composer_autoload', 'migrate_gdocs'));
 		$this->privileged_user = $this->drupalCreateUser(
 			array(
@@ -26,45 +28,35 @@ class testGoogleSpreadsheetSource extends DrupalWebTestCase
 		);
 		$this->drupalLogin($this->privileged_user);
 
-		//Get auth
-		$json_file = __DIR__ . '/Aduro-18fe239da8f0.json';
-		$json = json_decode(file_get_contents($json_file));
-		$private_key = file_get_contents(__DIR__.'/Aduro-e4b739040291.p12');
-
-		$this->auth = array(
-			'client_id'            => $json->client_id,
-			'client_email'         => $json->client_email,
-			'private_key'          => $private_key,
-			'private_key_password' => 'notasecret'
-		);
+		//Setup the service request
+		$serviceRequest = new TestServiceRequest();
+		ServiceRequestFactory::setInstance($serviceRequest);
 	}
 
 	/**
 	 * Test class GoogleSpreadsheet
 	 */
-	public function testGoogleSpreadsheetService()
+	public function testGoogleSpreadsheetSourceFactory()
 	{
-		//Set up auth
-		$google_client = new Google_Client();
-		$google_client->setApplicationName('Aduro Fixtures');
-		googleSpreadsheetSourceFactory::setServiceRequest($this->auth, $google_client);
-
-		$this->assertNotNull(googleSpreadsheetSourceFactory::getAccessToken(),'Access token is not null');
-
+		//Ensure I get the source object back out
 		$spreadsheet_service = new SpreadsheetService();
+		$source = googleSpreadsheetSourceFactory::getGoogleSpreadsheetSource($spreadsheet_service,'dummy-id');
 
-		//Get list of spreadsheets
-		$spreadsheetFeed = $spreadsheet_service->getSpreadsheets();
-		$this->assertEqual(get_class($spreadsheetFeed),'Google\Spreadsheet\SpreadsheetFeed',"Spreadsheet can be returned");
+		$this->assertTrue($source instanceof GoogleSpreadsheet);
 	}
 
-	public function testGoogleSpreadsheet(){
-		$id = "14at56ke6g4qbV8-EyDZ6Pv0RNFbRmjeLXbvIkxuQY_c";
+	public function testGoogleSpreadsheet()
+	{
 		$spreadsheet_service = new SpreadsheetService();
-		$source = googleSpreadsheetSourceFactory::getGoogleSpreadsheetSource($spreadsheet_service, $id);
-		$this->assertEqual(get_class($source),'GoogleSpreadsheet',"Spreadsheet can be returned");
-		$this->assertEqual($source->computeCount(),4,"There are 4 rows in the spreadsheet");
+		$spreadsheet = $spreadsheet_service->getSpreadsheetById('dummy-id');
+
+		//Load the new spreadsheet
+		$source = new GoogleSpreadsheet(array(), $spreadsheet);
+
+		//Ensure fields are correct
 		$fields = $source->fields();
-		$this->assertNotNull($fields, "There are fields");
+
+		$this->assertEqual($fields, array('id'=>'id','name'=>'name','mail'=>'mail','pass'=>'pass'),'Fields are matching');
+		$this->assertEqual($source->computeCount(),3,'Count is correct');
 	}
 }

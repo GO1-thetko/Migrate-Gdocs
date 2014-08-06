@@ -7,4 +7,5 @@ dependencies[] = composer_autoload
 files[] = tests/testGoogleSpreadsheetSource.test
 files[] = plugins/sources/googleSpreadsheet.inc
 files[] = plugins/sources/googleSpreadsheetSourceFactory.inc
+files[] = includes/migrateGdocsListFeed.inc
 configure = admin/config/services/migrate_oauth
