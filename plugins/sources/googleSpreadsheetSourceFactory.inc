@@ -11,11 +11,13 @@ use Google\Spreadsheet\ServiceRequestFactory;
 abstract class googleSpreadsheetSourceFactory
 {
 
-	protected $access_token;
+	static protected $access_token;
 
 	public static function getGoogleSpreadsheetSource(SpreadsheetService $spreadsheetService, $id)
 	{
-		if (!ServiceRequestFactory::getInstance()) {
+		try{
+			ServiceRequestFactory::getInstance();
+		}catch(\Google\Spreadsheet\Exception $e){
 			setMigrateGDocsServiceRequest(); //Set the migrateDocsServiceRequest
 		}
 
@@ -41,7 +43,6 @@ abstract class googleSpreadsheetSourceFactory
 
 		$access_token = json_decode($google_Client->getAccessToken());
 		$serviceRequest = new DefaultServiceRequest($access_token->access_token);
-		static::$serviceRequest = $serviceRequest;
 		static::$access_token = $access_token;
 		ServiceRequestFactory::setInstance($serviceRequest);
 	}

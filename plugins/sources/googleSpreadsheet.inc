@@ -36,6 +36,11 @@ class GoogleSpreadsheet extends MigrateSource
 		$this->worksheet_id = $worksheet_id;
 	}
 
+	public function __toString()
+	{
+		return $this->spreadsheet->getId();
+	}
+
 	/**
 	 * @param $worksheet_id
 	 * @return Worksheet
@@ -61,7 +66,7 @@ class GoogleSpreadsheet extends MigrateSource
 			$listFeed = $worksheet->getListFeed();
 			$listEntries = $listFeed->getEntries();
 
-			foreach($listEntries as $listEntry){
+			foreach ($listEntries as $listEntry) {
 				$rows[] = $listEntry->getValues();
 			}
 
@@ -77,9 +82,11 @@ class GoogleSpreadsheet extends MigrateSource
 	/**
 	 * Get the header columns
 	 */
-	private function getHeaders(Worksheet $worksheet){
+	private function getHeaders(Worksheet $worksheet)
+	{
 		//Get the listfeed from the worksheet
 		$listFeed = $worksheet->getListFeed();
+
 		return $listFeed->getColumnNames($listFeed->xml);
 	}
 
@@ -114,6 +121,7 @@ class GoogleSpreadsheet extends MigrateSource
 	{
 		$worksheet = $this->getWorksheet($this->worksheet_id);
 		$rows = $this->getWorksheetRows($worksheet);
+
 		return $rows->computeCount();
 	}
 
@@ -124,7 +132,7 @@ class GoogleSpreadsheet extends MigrateSource
 	{
 		$worksheet = $this->getWorksheet($this->worksheet_id);
 		$rows = $this->getWorksheetRows($worksheet);
-		$rows->rewind();
+		$rows->performRewind();
 	}
 
 	/**
@@ -144,7 +152,6 @@ class GoogleSpreadsheet extends MigrateSource
 
 		if ($rows->valid()) {
 			$row = $rows->current();
-			$row = $row->getValues();
 			$row = (object)$row;
 		} else {
 			return null;
@@ -156,7 +163,7 @@ class GoogleSpreadsheet extends MigrateSource
 
 class GoogleSpreadsheetIterator implements Iterator
 {
-	protected $rows;
+	protected $rows, $reset;
 	private $position = 0;
 
 	function __construct(array $rows)
@@ -165,7 +172,8 @@ class GoogleSpreadsheetIterator implements Iterator
 		$this->rows = $rows;
 	}
 
-	public function computeCount(){
+	public function computeCount()
+	{
 		return sizeof($this->rows);
 	}
 
@@ -177,7 +185,11 @@ class GoogleSpreadsheetIterator implements Iterator
 	 */
 	public function next()
 	{
-		++$this->position;
+		if ($this->reset) {
+			$this->reset = false;
+		} else {
+			++$this->position;
+		}
 	}
 
 	/**
@@ -212,6 +224,15 @@ class GoogleSpreadsheetIterator implements Iterator
 	public function rewind()
 	{
 		$this->position = 0;
+	}
+
+	/**
+	 * Some useless function so that migrates next returns back to first row in this values array
+	 */
+	public function performRewind()
+	{
+		$this->rewind();
+		$this->reset = true;
 	}
 
 	/**
