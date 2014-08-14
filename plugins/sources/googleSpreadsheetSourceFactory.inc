@@ -24,7 +24,7 @@ abstract class googleSpreadsheetSourceFactory
 		return new GoogleSpreadsheet(array(), $spreadsheetService->getSpreadsheetById($id));
 	}
 
-	public static function setServiceRequest($auth, Google_Client $google_Client)
+	public static function setServiceRequest($auth, Google_Client $google_Client, $cacheDirectory = "/tmp")
 	{
 
 		if ($google_Client->getAuth()->isAccessTokenExpired()) {
@@ -42,7 +42,12 @@ abstract class googleSpreadsheetSourceFactory
 		}
 
 		$access_token = json_decode($google_Client->getAccessToken());
-		$serviceRequest = new DefaultServiceRequest($access_token->access_token);
+		$serviceRequest = new CacheServiceRequest($access_token->access_token);
+		if(!empty($cacheDirectory)){
+			$serviceRequest->setCacheDirectory($cacheDirectory);
+		}
+
+
 		static::$access_token = $access_token;
 		ServiceRequestFactory::setInstance($serviceRequest);
 	}
